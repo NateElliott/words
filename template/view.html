@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block javascript %}
+
+    var converter = new showdown.Converter(),
+        text = document.getElementById('data-out').innerHTML,
+        html = converter.makeHtml(text);
+
+    document.getElementById('data-out').innerHTML = html;
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div id="data-out">{{data|safe}}</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+update();
+
+function update(){
+    var converter = new showdown.Converter(),
+        text      = document.getElementById('md-raw').value,
+        html      = converter.makeHtml(text);
+
+    html = html.replace(/(?:\r\n|\r|\n)/g, '<br />');
+    document.getElementById('md-render').innerHTML = html;
+
+};
+
+
+
+
+document.getElementById( 'md-raw' ).addEventListener( 'keydown', function( event ) {
+    if ( event.keyCode === 9 ) {
+        var selectionStartPos = this.selectionStart;
+        var selectionEndPos   = this.selectionEnd;
+        var oldContent        = this.value;
+
+        // Set the new content.
+        this.value = oldContent.substring( 0, selectionStartPos ) + "\t" + oldContent.substring( selectionEndPos );
+
+        // Set the new cursor position (current position + 1 to account for the new tab character).
+        this.selectionStart = this.selectionEnd = selectionStartPos + 1;
+
+        // Prevent the default action (tabbing to the next field or control).
+        event.preventDefault();
+    }
+});
+
+
+function match(){
+
+    var stat = document.getElementById('localconsole');
+
+    var a = document.getElementById('md-raw');
+    var b = document.getElementById('md-render');
+
+    stat.innerHTML = a.scrollTop + ', ' + (b.scrollTop/(b.scrollHeight-b.offsetHeight));
+
+};
+
+
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="col-md-6">
+
+        <input class="md-title" placeholder="Title">
+        <button class="btn btn-default">Save</button>
+        <span id="localconsole"></span>
+    </div>
+
+</div>
+
+
+<div class="container">
+    <div class="col-md-6">
+        <textarea class="md-input" id="md-raw" onscroll="match();" onkeyup="update()"># Heading
+
+## Sub-heading
+
+### Another deeper heading
+
+Paragraphs are separated
+by a blank line.
+
+Two spaces at the end of a line leave a
+line break.
+
+Text attributes _italic_, *italic*, __bold__, **bold**, `monospace`.
+
+Horizontal rule:
+
+---
+
+Bullet list:
+
+  * apples
+  * oranges
+  * pears
+
+Numbered list:
+
+  1. apples
+  2. oranges
+  3. pears
+
+A [link](http://example.com).</textarea>
+    </div>
+    <div class="col-md-6">
+        <div class="md-output" id="md-render" onscroll="match();"></div>
+    </div>
+
+</div>
+
+{% endblock %}
