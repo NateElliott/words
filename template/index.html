@@ -1,63 +1,42 @@
 {% extends 'base.html' %}
 
+{% block javascript %}
+
+
+
+
+
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
 
-    <form action="add" method="post" enctype="multipart/form-data" class="fileupload">
-
-
-        <div class="col-md-4">
-            {% csrf_token %}
-            <b>URL:</b>
-            <input type="text" name="data-url">
-            <hr>
-            <b>FILE:</b>
-            <label for="upload">
-                <span id="filename"><b class="btn btn-xs btn-default">Select File</b></span>
-            </label>
-            <input type="file"
-                   name="data-file"
-                   id="upload"
-                   class="upload"
-                   accept=".md,.markdown"
-                   onchange="updateUpload()">
-        </div>
-        <div class="col-md-4">
-            <select name="store" class="form-control">
-            {% for ea in data %}
-                <option value="{{ea.store}}">{{ea.store}}</option>
-            {% endfor %}
-            </select>
-
-
-
-
-            {% csrf_token %}
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </div>
-
-        <div class="col-md-4">
-            TBD
-        </div>
-
-
-    </form>
-
-
-</div>
 <hr>
 <div class="container">
-    <div class="col-md-1">
-        <ul class="list-group">
-            <a href="#!">Files</a>
-            <a href="#!">Stores</a>
-            <a href="#!">Settings</a>
-        </ul>
+    <div class="col-md-2">
 
+        <div class="list-group">
+            <a href="#!" class="list-group-item">
+                <form action="add" method="post" enctype="multipart/form-data" class="fileupload form-inline">
+                    {% csrf_token %}
+                    <label for="upload"><span id="filename">Upload File</span></label>
+                    <input type="file" name="data-file" id="upload" class="upload" accept=".md,.markdown" onchange="updateUpload()">
+                </form>
+            </a>
+
+            <a href="/new" class="list-group-item">
+                Create New
+            </a>
+            <!--
+            <a href="#!" class="list-group-item">
+                URL
+            </a>
+            -->
+
+        </div>
     </div>
 
-    <div class="col-md-8 col-md-offset-1">
+    <div class="col-md-8">
 
     <table class="table table-bordered">
     {% for ea in data %}

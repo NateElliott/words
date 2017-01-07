@@ -81,12 +81,27 @@ class AddUrlView(View):
         if request.POST.get('data-url'):
             source = request.POST.get('data-url')
             file = source.split('/')[-1]
+            status = 'public'
             data = urllib.request.urlopen(request.POST['data-url']).read()
 
-        if request.FILES.get('data-file'):
+        elif request.FILES.get('data-file'):
             source = request.FILES.get('data-file')
             file = source.name
+            status = 'private'
             data = request.FILES['data-file'].read()
+
+        elif request.POST.get('body'):
+            source = request.user.username
+
+            if request.POST.get('title'):
+                file = request.POST.get('title')
+            else:
+                file = '{}.md'.format(generator.id_generator(size=8))
+
+            status = request.POST.get('status')
+            data = request.POST.get('body').encode('utf-8', 'ignore')
+
+
 
         store = generator.id_generator(size=8)
 
@@ -98,13 +113,13 @@ class AddUrlView(View):
         if not os.path.exists(mdpath):
             os.mkdir(mdpath)
 
-        f = open(os.path.join(mdpath,file),'wb')
+        f = open(os.path.join(mdpath, file), 'wb')
         f.write(data)
 
         Paper(name=file,
               size=len(data),
               store=store,
-              status='private',
+              status=status,
               owner=request.user,
               origin=source).save()
 
@@ -140,7 +155,7 @@ class FileViewView(View):
 
     def openfile(self):
 
-        with open(self.mdpath,'rb') as f:
+        with open(self.mdpath, 'rb') as f:
             fdata = f.read().decode('utf-8', 'ignore')
         f.close()
 
@@ -159,3 +174,22 @@ class FileNewView(View):
 
         return render(request, self.template_name)
 
+
+    def post(self, request):
+
+        if request.POST.get('title'):
+            title = request.POST.get('title')
+        else:
+            title = generator.id_generator(size=6)
+
+        body = request.POST.get('body')
+
+
+        Paper(name=title,
+              size=len(body),
+              store=store,
+              status='private',
+              owner=request.user,
+              origin=source).save()
+
+        return HttpResponse('gtg')

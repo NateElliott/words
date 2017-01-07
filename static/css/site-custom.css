@@ -48,3 +48,7 @@ xmp {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 
 }
+
+#filename {
+    font-weight: 200;
+}

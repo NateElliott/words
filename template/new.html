@@ -53,10 +53,22 @@ function match(){
 {% block content %}
 <div class="container">
     <div class="col-md-6">
+        <form action="add" method="post" class="form-inline">
+            {% csrf_token %}
 
-        <input class="md-title" placeholder="Title">
-        <button class="btn btn-default">Save</button>
-        <span id="localconsole"></span>
+            <div class="form-group">
+                <input class="form-control md-title" name="title" placeholder="Title">
+            </div>
+            <div class="form-group">
+                <select name="status" class="form-control">
+                    <option value="private">private</option>
+                    <option value="public">public</option>
+                </select>
+
+            </div>
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Save</button>
+            </div>
     </div>
 
 </div>
@@ -64,7 +76,7 @@ function match(){
 
 <div class="container">
     <div class="col-md-6">
-        <textarea class="md-input" id="md-raw" onscroll="match();" onkeyup="update()"># Heading
+        <textarea class="md-input" id="md-raw" name="body" onscroll="match();" onkeyup="update()"># Heading
 
 ## Sub-heading
 
@@ -96,6 +108,7 @@ Numbered list:
 
 A [link](http://example.com).</textarea>
     </div>
+    </form>
     <div class="col-md-6">
         <div class="md-output" id="md-render" onscroll="match();"></div>
     </div>

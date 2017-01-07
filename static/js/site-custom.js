@@ -9,5 +9,5 @@ function updateUpload() {
         filename = filename.substring(lastIndex + 1);
     }
 
-    output.innerHTML = filename;
+    output.innerHTML = filename + '&nbsp;<button type="submit" class="btn btn-xs btn-primary">Upload</button>';
 }
