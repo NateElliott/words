@@ -9,7 +9,7 @@ class Paper(models.Model):
 
     name = models.TextField(max_length=255)
     store = models.TextField(max_length=255)
-    status = models.TextField(max_length=128, default='public')
+    is_public = models.BooleanField(default=True)
     origin = models.TextField(max_length=255)
     size = models.IntegerField()
     owner = models.ForeignKey(User,on_delete=models.CASCADE)

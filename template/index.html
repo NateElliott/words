@@ -11,21 +11,21 @@
 {% block content %}
 
 
-<hr>
+<hr xmlns="http://www.w3.org/1999/html">
 <div class="container">
     <div class="col-md-2">
 
         <div class="list-group">
+
+            <a href="/new" class="list-group-item">
+                Create New
+            </a>
             <a href="#!" class="list-group-item">
                 <form action="add" method="post" enctype="multipart/form-data" class="fileupload form-inline">
                     {% csrf_token %}
                     <label for="upload"><span id="filename">Upload File</span></label>
                     <input type="file" name="data-file" id="upload" class="upload" accept=".md,.markdown" onchange="updateUpload()">
                 </form>
-            </a>
-
-            <a href="/new" class="list-group-item">
-                Create New
             </a>
             <!--
             <a href="#!" class="list-group-item">
@@ -38,20 +38,29 @@
 
     <div class="col-md-8">
 
-    <table class="table table-bordered">
+    <table class="table">
     {% for ea in data %}
         <tr>
             <td>
-                <a href="view/{{ea.store}}/{{ea}}">{{ea}}</a>
+                <a href="edit/{{ea.store}}/{{ea}}">{{ea}}</a>
             </td>
             <td>
-                {{ea.status}}
+
+                {% if ea.is_public %}
+                public
+                {% else %}
+                <code>Draft</code>
+                {% endif %}
+
+
+
             </td>
-            <td>
-                {{ea.size}}
-            </td>
+
             <td>
                 {{ea.datetime}}
+            </td>
+            <td>
+                <a href="edit/{{ea.store}}/{{ea}}">edit</a>
             </td>
 
         </tr>

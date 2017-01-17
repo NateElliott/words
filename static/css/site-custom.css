@@ -44,11 +44,41 @@ xmp {
 .md-title {
     padding: 3px;
     font-size: 16px;
-    width: 50%;
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-
 }
 
 #filename {
     font-weight: 200;
+}
+
+.editor {
+    border: 1px solid #ddd;
+}
+
+.file-head {
+    padding: 5px 10px;
+}
+
+.file-head span {
+    font-size: 18px;
+}
+
+.file-head span em {
+    padding: 0px 5px;
+    font-weight: bold;
+    color: #aaa;
+}
+
+.file-head span input {
+    color: #333;
+    outline: none;
+    border: 0px;
+    border-bottom: 1px solid #aaa;
+}
+
+.file-head #file-message {
+    font-size: 14px;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    color: #aaa;
+    float: right;
 }

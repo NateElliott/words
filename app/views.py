@@ -12,9 +12,9 @@ from django.utils.decorators import method_decorator
 import urllib.request
 
 from .models import User, Paper
-from .helper import generator
+from .helper import generator, filehandler
 
-import os
+import os, string
 
 from django.conf import settings
 
@@ -81,13 +81,11 @@ class AddUrlView(View):
         if request.POST.get('data-url'):
             source = request.POST.get('data-url')
             file = source.split('/')[-1]
-            status = 'public'
             data = urllib.request.urlopen(request.POST['data-url']).read()
 
         elif request.FILES.get('data-file'):
             source = request.FILES.get('data-file')
             file = source.name
-            status = 'private'
             data = request.FILES['data-file'].read()
 
         elif request.POST.get('body'):
@@ -98,7 +96,6 @@ class AddUrlView(View):
             else:
                 file = '{}.md'.format(generator.id_generator(size=8))
 
-            status = request.POST.get('status')
             data = request.POST.get('body').encode('utf-8', 'ignore')
 
 
@@ -119,7 +116,7 @@ class AddUrlView(View):
         Paper(name=file,
               size=len(data),
               store=store,
-              status=status,
+              is_public=False,
               owner=request.user,
               origin=source).save()
 
@@ -136,30 +133,17 @@ class AddUrlView(View):
 
 class FileViewView(View):
     template_name = 'view.html'
-
     def get(self, request, store, file):
-
         try:
             op = Paper.objects.filter(store=store)[0]
-            self.mdpath = os.path.join(settings.BASE_DIR,'storage',op.owner.username,op.store,file)
-            if os.path.exists(self.mdpath):
-
-                if op.status == 'public':
-                    return render(request, self.template_name, {'data':self.openfile()})
-                elif op.status == 'private' and op.owner.username == request.user.username:
-                    return render(request, self.template_name, {'data': self.openfile()})
+            mdpath = os.path.join(settings.BASE_DIR,'storage',op.owner.username,op.store,file)
+            if os.path.exists(mdpath):
+                if op.is_public or op.owner.username == request.user.username:
+                    return render(request, self.template_name, {'data':filehandler.getfile(mdpath)})
 
         except:
             return HttpResponse(status=404)
 
-
-    def openfile(self):
-
-        with open(self.mdpath, 'rb') as f:
-            fdata = f.read().decode('utf-8', 'ignore')
-        f.close()
-
-        return fdata
 
 
 
@@ -168,28 +152,26 @@ class FileViewView(View):
 
 
 class FileNewView(View):
-    template_name = 'new.html'
-
+    template_name = 'editor.html'
     def get(self, request):
-
-        return render(request, self.template_name)
+        default_file = os.path.join(settings.BASE_DIR,'storage','default.md')
+        return render(request, self.template_name,{'filedata':filehandler.getfile(default_file)})
 
 
     def post(self, request):
-
-        if request.POST.get('title'):
-            title = request.POST.get('title')
-        else:
-            title = generator.id_generator(size=6)
-
-        body = request.POST.get('body')
+        return HttpResponse('<pre>{}</pre>'.format(request.POST.get('code')))
 
 
-        Paper(name=title,
-              size=len(body),
-              store=store,
-              status='private',
-              owner=request.user,
-              origin=source).save()
 
-        return HttpResponse('gtg')
+class FileEditView(View):
+    template_name = 'new.html'
+    def get(self, request, store, file):
+        try:
+            op = Paper.objects.filter(store=store)[0]
+            mdpath = os.path.join(settings.BASE_DIR,'storage',op.owner.username,op.store,file)
+            if os.path.exists(mdpath):
+                if op.is_public or op.owner.username == request.user.username:
+                    return render(request, self.template_name, {'filedata':filehandler.getfile(mdpath),
+                                                                'file_obj':op})
+        except:
+            return HttpResponse(status=404)
