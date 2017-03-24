@@ -1,86 +1,83 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block js_include %}
+
+    <script src="{% static 'js/codemirror-5.22.0/lib/codemirror.js' %}"></script>
+    <script src="{% static 'js/codemirror-5.22.0/addon/mode/loadmode.js' %}"></script>
+    <script src="{% static 'js/codemirror-5.22.0/mode/meta.js' %}"></script>
+    <script src="{% static 'js/codemirror-5.22.0/addon/selection/active-line.js' %}"></script>
+
+{% endblock %}
+
 {% block javascript %}
 
 
-var source = document.getElementById('filename');
-source.addEventListener('keyup', mimeType);
+    var source = document.getElementById('filename');
+    var editorWindow = document.getElementById('editor');
+    var fileMessage = document.getElementById('file-message');
+    var editor = CodeMirror.fromTextArea(editorWindow, {
+        styleActiveLine: true,
+        lineNumbers: true,
+        matchBrackets: true
+    });
 
-var editorWindow = document.getElementById('editor');
+    updateFileMessage();
 
-var fileMessage = document.getElementById('file-message');
+    source.addEventListener('keyup', mimeType);
 
-
-var editor = CodeMirror.fromTextArea(editorWindow, {
-    styleActiveLine: true,
-    lineNumbers: true,
-    styleActiveLine: true
-});
-
-
-CodeMirror.modeURL = "{% static 'js/codemirror-5.22.0' %}/mode/%N/%N.js";
-
-
-editor.setSize(null, 600);
-editor.on('cursorActivity', function(){
-    var loc = editor.lineCount();
-    var clen = editor.getValue().length;
-
-    fileMessage.innerHTML = 'loc: ' + loc + ', size: ' + clen;
-
-});
+    CodeMirror.modeURL = "{% static 'js/codemirror-5.22.0' %}/mode/%N/%N.js";
+    editor.setSize(null, 600);
+    editor.on('cursorActivity', updateFileMessage);
 
 
-function mimeType(){
-    type = getExt(source.value);
-    editor.setOption('mode', type.mime);
-    CodeMirror.autoLoadMode(editor, type.mode);
-}
+    function updateFileMessage(){
+        var loc = editor.lineCount();
+        var clen = editor.getValue().length;
+        fileMessage.innerHTML = 'loc: ' + loc + ', ' + clen + ' bytes';
+    }
 
-function getExt(source){
-    var file = source.split('.');
-    if (file.length > 1){
-        var ext = file[file.length-1]
-        var info = CodeMirror.findModeByExtension(ext);
-        if (info) {
-            return info;
+    function mimeType(){
+        type = getExt(source.value);
+        editor.setOption('mode', type.mime);
+        CodeMirror.autoLoadMode(editor, type.mode);
+    }
+
+    function getExt(source){
+        var file = source.split('.');
+        if (file.length > 1){
+            var ext = file[file.length-1]
+            var info = CodeMirror.findModeByExtension(ext);
+            if (info) {
+                return info;
+            }
         }
     }
-}
-
 
 {% endblock %}
-
 
 {% block content %}
-<form method="post" action="new">
-    {% csrf_token %}
-
-    <div class="container">
-        <div class="row">
-
-
-            <div class="col-md-12">
-                <div class="file-head">
-                    <span>project</span>
-                    <span><em>/</em></span>
-                    <span><input id="filename" name="filename" placeholder="Filename"></span>
-                    <span id="file-message"></span>
+    <form method="post" action="new" autocomplete="off">
+        {% csrf_token %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="file-head">
+                        <!--<span>project</span>
+                        <span><em>/</em></span>-->
+                        <span><input id="filename" name="filename" placeholder="Filename"></span>
+                        <span><button type="submit" class="btn btn-xs btn-primary">Save</button></span>
+                        <span id="file-message"></span>
+                    </div>
                 </div>
             </div>
-
-
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="editor">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="editor">
                         <textarea name="code" id="editor"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
 {% endblock %}
-
-

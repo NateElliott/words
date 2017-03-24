@@ -1,23 +1,19 @@
 from django.views import View
+from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-
-from django.conf import settings
-
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-
 from django.utils.decorators import method_decorator
-
-import urllib.request
-
-from .models import User, Paper
-from .helper import generator, filehandler
-
-import os, string
-
 from django.conf import settings
 
+from django.db.models import F
+
+from .models import User, Paper, Projects, Files
+from .helper import generator, filehandler
+
+import urllib.request
+import os, string, json
 
 
 class LoginView(View):
@@ -41,8 +37,6 @@ class LoginView(View):
 
 
 
-
-
 class LogoutView(View):
     def get(self, request):
         logout(request)
@@ -52,19 +46,18 @@ class LogoutView(View):
 
 
 
-
-
-
-
 class IndexView(View):
     template_name = 'index.html'
-
 
     @method_decorator(login_required)
     def get(self, request):
 
-        list = Paper.objects.all().order_by('-datetime')
-        return render(request, self.template_name,{'data':list})
+        projects = Projects.objects.order_by('-created_datetime')
+
+
+        op = serializers.serialize('json', projects)
+
+        return render(request, self.template_name,{'projects':op})
 
 
 
@@ -98,9 +91,7 @@ class AddUrlView(View):
 
             data = request.POST.get('body').encode('utf-8', 'ignore')
 
-
-
-        store = generator.id_generator(size=8)
+        store = generator.id_generator(size=16)
 
         user_path = os.path.join(settings.BASE_DIR, 'storage', request.user.username)
         if not os.path.exists(user_path):
@@ -123,11 +114,6 @@ class AddUrlView(View):
         f.close()
 
         return redirect('/')
-
-
-
-
-
 
 
 
@@ -157,9 +143,21 @@ class FileNewView(View):
         default_file = os.path.join(settings.BASE_DIR,'storage','default.md')
         return render(request, self.template_name,{'filedata':filehandler.getfile(default_file)})
 
-
     def post(self, request):
-        return HttpResponse('<pre>{}</pre>'.format(request.POST.get('code')))
+
+        name = request.POST.get('filename')
+
+        code = request.POST.get('code')
+
+        store = generator.id_generator(size=16)
+
+
+        return HttpResponse('<b>{}</b><br><pre><code>{}</code></pre>'.format(name, code))
+
+
+
+
+
 
 
 

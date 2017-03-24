@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'view/(?P<store>[-\w]+)/(?P<file>[-\w. ]+)', FileViewView.as_view()),
     url(r'edit/(?P<store>[-\w]+)/(?P<file>[-\w. ]+)', FileEditView.as_view()),
 
+
 ]

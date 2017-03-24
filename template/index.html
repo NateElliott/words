@@ -1,73 +1,46 @@
 {% extends 'base.html' %}
 
+{% block title %}Home{% endblock %}
+
+
 {% block javascript %}
 
+    $(document).ready(function () {
+        var json = {{projects|safe}};
+        var displayTable = document.getElementById('data-table');
+        var row;
 
+        for (var i = 0; i < json.length; i++) {
 
+            row = $('<tr id=' + json[i].fields.name + ' />');
+            var lnk = '<td><a href="'+json[i].fields.name+'">'+json[i].fields.name+'</a></td>';
 
+            row.append(lnk);
+            row.append("<td>" + Date(json[i].fields.created_datetime) + "</td>");
+
+            $('#data-table').append(row);
+        }
+    });
 
 {% endblock %}
 
 {% block content %}
 
 
-<hr xmlns="http://www.w3.org/1999/html">
+<hr>
 <div class="container">
     <div class="col-md-2">
 
         <div class="list-group">
 
-            <a href="/new" class="list-group-item">
-                Create New
-            </a>
-            <a href="#!" class="list-group-item">
-                <form action="add" method="post" enctype="multipart/form-data" class="fileupload form-inline">
-                    {% csrf_token %}
-                    <label for="upload"><span id="filename">Upload File</span></label>
-                    <input type="file" name="data-file" id="upload" class="upload" accept=".md,.markdown" onchange="updateUpload()">
-                </form>
-            </a>
-            <!--
-            <a href="#!" class="list-group-item">
-                URL
-            </a>
-            -->
+            <a href="/new" class="list-group-item">New</a>
 
         </div>
     </div>
 
     <div class="col-md-8">
-
-    <table class="table">
-    {% for ea in data %}
-        <tr>
-            <td>
-                <a href="edit/{{ea.store}}/{{ea}}">{{ea}}</a>
-            </td>
-            <td>
-
-                {% if ea.is_public %}
-                public
-                {% else %}
-                <code>Draft</code>
-                {% endif %}
-
-
-
-            </td>
-
-            <td>
-                {{ea.datetime}}
-            </td>
-            <td>
-                <a href="edit/{{ea.store}}/{{ea}}">edit</a>
-            </td>
-
-        </tr>
-    {% endfor %}
-
-
-    </table>
+        <table class="table" id="data-table">
+        </table>
 
     </div>
 

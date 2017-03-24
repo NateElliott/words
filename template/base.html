@@ -1,5 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -11,6 +10,7 @@
 
     </head>
     <body>
+
         <div class="container">
             <div class="userbar">
             {% if user.is_authenticated %}
@@ -18,12 +18,12 @@
                     {{user.first_name}} {{user.last_name}}
                 {% else %}
                     {{user.username}}
-
                 {% endif %}
                 <a href="logout">Logout</a>
             {% endif %}
             </div>
         </div>
+
         <div class="container">
         {% block content %}{% endblock %}
         </div>
@@ -31,14 +31,8 @@
 
     <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/showdown.min.js' %}"></script>
     <script src="{% static 'js/site-custom.js' %}"></script>
-
-    <script src="{% static 'js/codemirror-5.22.0/lib/codemirror.js' %}"></script>
-
-    <script src="{% static 'js/codemirror-5.22.0/addon/mode/loadmode.js' %}"></script>
-    <script src="{% static 'js/codemirror-5.22.0/mode/meta.js' %}"></script>
-
+    {% block js_include %}{% endblock %}
 
 
     <script>

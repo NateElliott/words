@@ -53,6 +53,7 @@ xmp {
 
 .editor {
     border: 1px solid #ddd;
+    width: 100%;
 }
 
 .file-head {
@@ -76,9 +77,14 @@ xmp {
     border-bottom: 1px solid #aaa;
 }
 
-.file-head #file-message {
+#file-message {
     font-size: 14px;
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
     color: #aaa;
     float: right;
+    display: inline-block;
 }
+
+
+
+

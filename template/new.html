@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block js_include %}
+    <script src="{% static 'js/showdown.min.js' %}"></script>
+{% endblock %}
+
+
 {% block javascript %}
 
 update();
@@ -51,10 +56,9 @@ function match(){
 
 
 {% block content %}
-
+<form action="add" method="post" class="form-inline">
 <div class="container">
     <div class="col-md-12">
-        <form action="add" method="post" class="form-inline">
             {% csrf_token %}
             <div class="form-group">
                 <input class="form-control md-title" name="title" value="{{file_obj.name}}" placeholder="Title">
@@ -71,11 +75,11 @@ function match(){
     <div class="col-md-6">
         <textarea class="md-input" id="md-raw" name="body" onscroll="match();" onkeyup="update()">{{filedata|safe}}</textarea>
     </div>
-    </form>
+
     <div class="col-md-6">
         <div class="md-output" id="md-render" onscroll="match();"></div>
     </div>
 
 </div>
-
+</form>
 {% endblock %}
