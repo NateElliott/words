@@ -5,3 +5,4 @@ def getfile(mdpath):
     f.close()
 
     return fdata
+

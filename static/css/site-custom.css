@@ -49,6 +49,7 @@ xmp {
 
 #filename {
     font-weight: 200;
+    color: #444;
 }
 
 .editor {
@@ -62,6 +63,11 @@ xmp {
 
 .file-head span {
     font-size: 18px;
+}
+
+.file-head span.save {
+    display: inline-block;
+    float: right;
 }
 
 .file-head span em {
@@ -80,11 +86,18 @@ xmp {
 #file-message {
     font-size: 14px;
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    background-color: #f7f7f7;
+    border-top: 1px solid #ddd;
+    padding: 1px 5px;
     color: #aaa;
-    float: right;
-    display: inline-block;
+
 }
 
+#file-message span {
+    font-size: 14px;
+}
 
-
+#file-status {
+    float: right;
+}
 

@@ -12,36 +12,57 @@
 
 {% block javascript %}
 
-
     var source = document.getElementById('filename');
     var editorWindow = document.getElementById('editor');
+
     var fileMessage = document.getElementById('file-message');
+    var fileStatus = document.getElementById('file-status');
+
+    var fileMessageLOC = document.getElementById('loc');
+    var fileMessageBytes = document.getElementById('bytes');
+
+    var fileCursorX = document.getElementById('curX');
+    var fileCursorY = document.getElementById('curY');
+
     var editor = CodeMirror.fromTextArea(editorWindow, {
         styleActiveLine: true,
         lineNumbers: true,
         matchBrackets: true
     });
 
-    updateFileMessage();
-
-    source.addEventListener('keyup', mimeType);
-
-    CodeMirror.modeURL = "{% static 'js/codemirror-5.22.0' %}/mode/%N/%N.js";
-    editor.setSize(null, 600);
-    editor.on('cursorActivity', updateFileMessage);
-
-
-    function updateFileMessage(){
-        var loc = editor.lineCount();
-        var clen = editor.getValue().length;
-        fileMessage.innerHTML = 'loc: ' + loc + ', ' + clen + ' bytes';
-    }
-
-    function mimeType(){
+    source.addEventListener('keyup', function(){
         type = getExt(source.value);
         editor.setOption('mode', type.mime);
         CodeMirror.autoLoadMode(editor, type.mode);
+
+
+
+    });
+
+    CodeMirror.modeURL = '{% static "js/codemirror-5.22.0" %}/mode/%N/%N.js';
+
+    editor.setSize(null, window.innerHeight*0.75);
+
+    window.onresize = function(e){
+        editor.setSize(null, window.innerHeight*0.75);
     }
+
+    editor.on('cursorActivity', function(){
+        fileMessageLOC.innerHTML = editor.lineCount();
+        fileMessageBytes.innerHTML = editor.getValue().length;
+
+        fileCursorX.innerHTML = editor.getCursor().ch+1;
+        fileCursorY.innerHTML = editor.getCursor().line+1;
+
+
+
+    });
+
+    editor.on('change', function(){
+        if (source.value=='') {
+            source.value=Math.random().toString(36).substr(2,7)+'.md';
+        }
+    });
 
     function getExt(source){
         var file = source.split('.');
@@ -57,17 +78,17 @@
 {% endblock %}
 
 {% block content %}
+
     <form method="post" action="new" autocomplete="off">
         {% csrf_token %}
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
                     <div class="file-head">
-                        <!--<span>project</span>
-                        <span><em>/</em></span>-->
                         <span><input id="filename" name="filename" placeholder="Filename"></span>
-                        <span><button type="submit" class="btn btn-xs btn-primary">Save</button></span>
-                        <span id="file-message"></span>
+                        <span class="save"><button type="submit" class="btn btn-xs btn-primary">
+                            save
+                        </button></span>
                     </div>
                 </div>
             </div>
@@ -75,9 +96,17 @@
                 <div class="col-md-12">
                     <div class="editor">
                         <textarea name="code" id="editor"></textarea>
+                        <span id="editorMeta">
+                            <div id="file-message">
+                                <spand id="curX">1</spand>:<spand id="curY">1</spand>
+                                <span id="loc">1</span>, <span id="bytes">0</span> b
+                                <span id="file-status">status</span>
+                            </div>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+
 {% endblock %}
