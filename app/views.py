@@ -4,13 +4,15 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import User, Files
 from .helper import generator, filehandler
 
-import os, string, json
+import os, string, hashlib
 
 
 class LoginView(View):
@@ -52,10 +54,51 @@ class FileNewView(View):
         default_file = os.path.join(settings.BASE_DIR,'storage','default.md')
         return render(request, self.template_name,{'filedata':filehandler.getfile(default_file)})
 
+
+
+class FileSaveView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(FileSaveView, self).dispatch(request, *args, **kwargs)
+
+    @method_decorator(login_required)
     def post(self, request):
 
-        name = request.POST.get('filename')
-        code = request.POST.get('code')
-        store = generator.id_generator(size=16)
+        wdata = request.POST.get('code')
+        wfile = request.POST.get('filename')
+        whash = hashlib.sha1(wdata.encode('utf-8')).hexdigest()[:6]
 
-        return HttpResponse('<b>{}-{}</b><br><pre><code>{}</code></pre>'.format(name,store,code))
+        try:
+            file = Files.objects.get(name=wfile)
+            if whash != file.chash:
+                file.content = wdata
+                file.chash = whash
+                file.save()
+
+        except:
+            file = Files(name=wfile,
+                         store=generator.id_generator(8),
+                         content=wdata,
+                         chash=whash,
+                         owner=request.user,
+                         public=False)
+            file.save()
+
+
+        response_text = {}
+        response_text["hash"] = file.chash
+        response_text["dtg"] = file.updated
+
+        return JsonResponse(response_text)
+
+
+
+
+
+
+
+
+
+
+

@@ -24,6 +24,10 @@
     var fileCursorX = document.getElementById('curX');
     var fileCursorY = document.getElementById('curY');
 
+    var fileSave = document.getElementById('save-btn');
+
+
+
     var editor = CodeMirror.fromTextArea(editorWindow, {
         styleActiveLine: true,
         lineNumbers: true,
@@ -34,18 +38,23 @@
         type = getExt(source.value);
         editor.setOption('mode', type.mime);
         CodeMirror.autoLoadMode(editor, type.mode);
-
-
-
     });
 
     CodeMirror.modeURL = '{% static "js/codemirror-5.22.0" %}/mode/%N/%N.js';
 
-    editor.setSize(null, window.innerHeight*0.75);
+
 
     window.onresize = function(e){
         editor.setSize(null, window.innerHeight*0.75);
-    }
+    };
+
+    $(fileSave).on('click', function(){
+        $.post('save',{filename: source.value, code: editor.getValue()},function(data){
+            fileStatus.innerHTML = data.hash;
+        });
+    });
+
+
 
     editor.on('cursorActivity', function(){
         fileMessageLOC.innerHTML = editor.lineCount();
@@ -53,16 +62,15 @@
 
         fileCursorX.innerHTML = editor.getCursor().ch+1;
         fileCursorY.innerHTML = editor.getCursor().line+1;
-
-
-
     });
+
 
     editor.on('change', function(){
         if (source.value=='') {
             source.value=Math.random().toString(36).substr(2,7)+'.md';
         }
     });
+
 
     function getExt(source){
         var file = source.split('.');
@@ -79,14 +87,14 @@
 
 {% block content %}
 
-    <form method="post" action="new" autocomplete="off">
+    <!--<form autocomplete="off">-->
         {% csrf_token %}
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
                     <div class="file-head">
                         <span><input id="filename" name="filename" placeholder="Filename"></span>
-                        <span class="save"><button type="submit" class="btn btn-xs btn-primary">
+                        <span class="save"><button id="save-btn" class="btn btn-xs btn-primary">
                             save
                         </button></span>
                     </div>
@@ -98,15 +106,15 @@
                         <textarea name="code" id="editor"></textarea>
                         <span id="editorMeta">
                             <div id="file-message">
-                                <spand id="curX">1</spand>:<spand id="curY">1</spand>
-                                <span id="loc">1</span>, <span id="bytes">0</span> b
-                                <span id="file-status">status</span>
+                                <spand id="curX">1</spand>:<spand id="curY">1</spand> |
+                                <span id="loc">1</span> l, <span id="bytes">0</span> b
+                                <span id="file-status"></span>
                             </div>
                         </span>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+    <!--</form>-->
 
 {% endblock %}

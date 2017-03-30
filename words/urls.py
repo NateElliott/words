@@ -13,4 +13,8 @@ urlpatterns = [
 
     url(r'new$', FileNewView.as_view()),
 
+    url(r'save$', FileSaveView.as_view()),
+
+
+
 ]
