@@ -88,6 +88,7 @@ class FileSaveView(View):
 
         response_text = {}
         response_text["hash"] = file.chash
+        response_text["store"] = file.store
         response_text["dtg"] = file.updated
 
         return JsonResponse(response_text)

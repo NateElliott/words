@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'login$', LoginView.as_view()),
     url(r'logout$', LogoutView.as_view()),
 
+
     url(r'new$', FileNewView.as_view()),
 
     url(r'save$', FileSaveView.as_view()),

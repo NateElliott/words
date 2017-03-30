@@ -7,6 +7,7 @@
     <script src="{% static 'js/codemirror-5.22.0/addon/mode/loadmode.js' %}"></script>
     <script src="{% static 'js/codemirror-5.22.0/mode/meta.js' %}"></script>
     <script src="{% static 'js/codemirror-5.22.0/addon/selection/active-line.js' %}"></script>
+    <script src="{% static 'js/editor.js' %}"></script>
 
 {% endblock %}
 
@@ -14,19 +15,14 @@
 
     var source = document.getElementById('filename');
     var editorWindow = document.getElementById('editor');
-
     var fileMessage = document.getElementById('file-message');
     var fileStatus = document.getElementById('file-status');
-
     var fileMessageLOC = document.getElementById('loc');
     var fileMessageBytes = document.getElementById('bytes');
-
     var fileCursorX = document.getElementById('curX');
     var fileCursorY = document.getElementById('curY');
-
     var fileSave = document.getElementById('save-btn');
-
-
+    var fileStore = document.getElementById('store');
 
     var editor = CodeMirror.fromTextArea(editorWindow, {
         styleActiveLine: true,
@@ -42,15 +38,17 @@
 
     CodeMirror.modeURL = '{% static "js/codemirror-5.22.0" %}/mode/%N/%N.js';
 
-
-
+    editor.setSize(null, window.innerHeight*0.75);
     window.onresize = function(e){
         editor.setSize(null, window.innerHeight*0.75);
     };
 
     $(fileSave).on('click', function(){
         $.post('save',{filename: source.value, code: editor.getValue()},function(data){
+
+            fileStatus.setAttribute("title", data.dtg);
             fileStatus.innerHTML = data.hash;
+            fileStore.innerHTML = data.store;
         });
     });
 
@@ -71,7 +69,6 @@
         }
     });
 
-
     function getExt(source){
         var file = source.split('.');
         if (file.length > 1){
@@ -87,34 +84,32 @@
 
 {% block content %}
 
-    <!--<form autocomplete="off">-->
-        {% csrf_token %}
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="file-head">
-                        <span><input id="filename" name="filename" placeholder="Filename"></span>
-                        <span class="save"><button id="save-btn" class="btn btn-xs btn-primary">
-                            save
-                        </button></span>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="editor">
-                        <textarea name="code" id="editor"></textarea>
-                        <span id="editorMeta">
-                            <div id="file-message">
-                                <spand id="curX">1</spand>:<spand id="curY">1</spand> |
-                                <span id="loc">1</span> l, <span id="bytes">0</span> b
-                                <span id="file-status"></span>
-                            </div>
-                        </span>
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="file-head">
+                    <span id="store"></span>
+                    <span><input id="filename" name="filename" placeholder="Filename"></span>
+                    <span class="save"><button id="save-btn" class="btn btn-xs btn-primary">
+                        save
+                    </button></span>
                 </div>
             </div>
         </div>
-    <!--</form>-->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="editor">
+                    <textarea name="code" id="editor"></textarea>
+                    <span id="editorMeta">
+                        <div id="file-message">
+                            <spand id="curX">1</spand>:<spand id="curY">1</spand> |
+                            <span id="loc">1</span> l, <span id="bytes">0</span> b
+                            <abbr id="file-status"></abbr>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

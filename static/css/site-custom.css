@@ -100,4 +100,6 @@ xmp {
 #file-status {
     float: right;
 }
-
+#store {
+    display: none;
+}
