@@ -1,8 +1,22 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
 
 {% block title %}Home{% endblock %}
 
+{% block js_include %}
+
+    <script src="{% static 'js/index.js' %}"></script>
+
+{% endblock %}
+
+
 {% block javascript %}
+
+
+
+
+
 
 {% endblock %}
 
@@ -16,5 +30,20 @@
             <a href="/new" class="list-group-item">New</a>
         </div>
     </div>
+    <div class="col-md-10">
+        <table class="table file-list" id="data-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th></th>
+                <th>updated</th>
+            </tr>
+            </thead>
+            <tr>
+
+            </tr>
+        </table>
+    </div>
 </div>
+
 {% endblock %}

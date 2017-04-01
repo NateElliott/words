@@ -45,7 +45,8 @@ class IndexView(View):
     @method_decorator(login_required)
     def get(self, request):
 
-        return render(request, self.template_name,{'data':'hello world'})
+
+        return render(request, self.template_name)
 
 
 class FileNewView(View):
@@ -67,6 +68,7 @@ class FileSaveView(View):
 
         wdata = request.POST.get('code')
         wfile = request.POST.get('filename')
+        wloc = request.POST.get('loc')
         whash = hashlib.sha1(wdata.encode('utf-8')).hexdigest()[:6]
 
         try:
@@ -74,6 +76,7 @@ class FileSaveView(View):
             if whash != file.chash:
                 file.content = wdata
                 file.chash = whash
+                file.loc = wloc
                 file.save()
 
         except:
@@ -81,6 +84,7 @@ class FileSaveView(View):
                          store=generator.id_generator(8),
                          content=wdata,
                          chash=whash,
+                         loc = wloc,
                          owner=request.user,
                          public=False)
             file.save()
@@ -89,17 +93,42 @@ class FileSaveView(View):
         response_text = {}
         response_text["hash"] = file.chash
         response_text["store"] = file.store
+        response_text["loc"] = file.loc
         response_text["dtg"] = file.updated
 
         return JsonResponse(response_text)
 
 
 
+class FileEditView(View):
+
+    template_name = 'editor.html'
+    def get(self, request, *args, **kwargs):
+        store = self.kwargs['store']
+
+        file = Files.objects.filter(store=store)[0]
+
+        return render(request, self.template_name, {'file':file})
 
 
 
+class ListAllView(View):
 
+    def get(self, request):
 
+        user_files = Files.objects.filter(owner=request.user).order_by('-updated')
+        fop = []
 
+        for f in user_files:
+            fop.append({
+                "pid":f.store,
+                "data":{
+                    "name":f.name,
+                    "hash":f.chash,
+                    "created": f.created,
+                    "updated":f.updated,
+                    "public": f.public
+                }
+            })
 
-
+        return JsonResponse(fop, safe=False)

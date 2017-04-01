@@ -10,6 +10,7 @@ class Files(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     public = models.BooleanField(default=True)
     chash = models.TextField(max_length=40)
+    loc = models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
