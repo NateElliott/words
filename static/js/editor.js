@@ -8,6 +8,7 @@
     var fileCursorY = document.getElementById('curY');
     var fileSave = document.getElementById('save-btn');
     var fileStore = document.getElementById('store');
+    var draftWarning = document.getElementById('draft-warning');
 
     var keytimers = [];
 
@@ -31,13 +32,12 @@
     };
 
 
-    function sendSave(){
+    function sendSave(draft=true){
         $.post('/save',{
             filename: source.value,
             code: editor.getValue(),
             loc: editor.getCursor().line+1},
             function(data){
-
                 fileStatus.setAttribute("title", data.dtg);
                 fileStatus.innerHTML = data.hash;
                 fileStore.innerHTML = data.store;
@@ -45,6 +45,7 @@
     }
 
     $(fileSave).on('click', function(){
+        draftWarning.style.display = 'none';
         sendSave();
     });
 
@@ -53,14 +54,13 @@
     editor.on('keyup', function(event){
         keytimers.push(setTimeout(function() {
             sendSave();
-        }, 3000));
+        }, 2000));
     });
 
     editor.on('keydown', function(){
         for (var i = 0; i < keytimers.length; i++) {
             clearTimeout(keytimers[i]);
         }
-        //quick reset of the timer array you just cleared
         keytimers = [];
     });
 
@@ -77,7 +77,10 @@
 
     editor.on('change', function(){
         if (source.value=='') {
-            source.value=Math.random().toString(36).substr(2,7)+'.md';
+            var draftName = Math.random().toString(36).substr(2,7)+'.md';
+            draftWarning.style.display = 'inline-block';
+            document.title = draftName + ' draft';
+            source.value = draftName;
         }
     });
 

@@ -11,6 +11,7 @@ class Files(models.Model):
     public = models.BooleanField(default=True)
     chash = models.TextField(max_length=40)
     loc = models.IntegerField()
+    draft = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

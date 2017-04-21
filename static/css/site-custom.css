@@ -108,3 +108,10 @@ xmp {
 .file-list {
     font-size: 1.1em;
 }
+
+#draft-warning {
+    font-size: 1em;
+    color: green;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    display: none;
+}
